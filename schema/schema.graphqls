@@ -1,0 +1,29 @@
+type Anime {
+  anime_id: Int!
+  name: String!
+  areas: [Area]!
+}
+
+type Area {
+  area_id: Int!
+  name: String!
+  spots: [Spot]!
+}
+
+type Spot {
+  spot_id: Int!
+  name: String!
+}
+
+type Guide {
+  guide_id: Int!
+  name: String!
+  animes: [Anime]!
+  areas: [Area]!
+}
+
+type Query {
+  animeList(name: String!): [Anime]!
+  animeListByAnimeId(anime_id: [Int]!): [Anime]!
+  GuideListByAnimeIdAndAreaId(area_id: [Int]!, anime_id: [Int]!): [Guide]!
+}
