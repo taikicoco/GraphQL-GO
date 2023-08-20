@@ -2,19 +2,26 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+type Anime struct {
+	AnimeID int     `json:"anime_id"`
+	Name    string  `json:"name"`
+	Areas   []*Area `json:"areas"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type Area struct {
+	AreaID int     `json:"area_id"`
+	Name   string  `json:"name"`
+	Spots  []*Spot `json:"spots"`
 }
 
-type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+type Guide struct {
+	GuideID int      `json:"guide_id"`
+	Name    string   `json:"name"`
+	Animes  []*Anime `json:"animes"`
+	Areas   []*Area  `json:"areas"`
+}
+
+type Spot struct {
+	SpotID int    `json:"spot_id"`
+	Name   string `json:"name"`
 }
