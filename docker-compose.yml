@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/app
-    working_dir: /app
+    working_dir: /app/server
     ports:
       - "1323:1323"
     restart: always

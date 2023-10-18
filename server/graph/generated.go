@@ -7,7 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"gql_server/graph/model"
+	"server/graph/model"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -23,6 +23,7 @@ import (
 // NewExecutableSchema creates an ExecutableSchema from the ResolverRoot interface.
 func NewExecutableSchema(cfg Config) graphql.ExecutableSchema {
 	return &executableSchema{
+		schema:     cfg.Schema,
 		resolvers:  cfg.Resolvers,
 		directives: cfg.Directives,
 		complexity: cfg.Complexity,
@@ -30,6 +31,7 @@ func NewExecutableSchema(cfg Config) graphql.ExecutableSchema {
 }
 
 type Config struct {
+	Schema     *ast.Schema
 	Resolvers  ResolverRoot
 	Directives DirectiveRoot
 	Complexity ComplexityRoot
@@ -81,12 +83,16 @@ type QueryResolver interface {
 }
 
 type executableSchema struct {
+	schema     *ast.Schema
 	resolvers  ResolverRoot
 	directives DirectiveRoot
 	complexity ComplexityRoot
 }
 
 func (e *executableSchema) Schema() *ast.Schema {
+	if e.schema != nil {
+		return e.schema
+	}
 	return parsedSchema
 }
 
@@ -293,14 +299,14 @@ func (ec *executionContext) introspectSchema() (*introspection.Schema, error) {
 	if ec.DisableIntrospection {
 		return nil, errors.New("introspection disabled")
 	}
-	return introspection.WrapSchema(parsedSchema), nil
+	return introspection.WrapSchema(ec.Schema()), nil
 }
 
 func (ec *executionContext) introspectType(name string) (*introspection.Type, error) {
 	if ec.DisableIntrospection {
 		return nil, errors.New("introspection disabled")
 	}
-	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
+	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
 var sources = []*ast.Source{
@@ -564,7 +570,7 @@ func (ec *executionContext) _Anime_areas(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]*model.Area)
 	fc.Result = res
-	return ec.marshalNArea2ᚕᚖgql_serverᚋgraphᚋmodelᚐArea(ctx, field.Selections, res)
+	return ec.marshalNArea2ᚕᚖserverᚋgraphᚋmodelᚐArea(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Anime_areas(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -704,7 +710,7 @@ func (ec *executionContext) _Area_spots(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.([]*model.Spot)
 	fc.Result = res
-	return ec.marshalNSpot2ᚕᚖgql_serverᚋgraphᚋmodelᚐSpot(ctx, field.Selections, res)
+	return ec.marshalNSpot2ᚕᚖserverᚋgraphᚋmodelᚐSpot(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Area_spots(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -842,7 +848,7 @@ func (ec *executionContext) _Guide_animes(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.([]*model.Anime)
 	fc.Result = res
-	return ec.marshalNAnime2ᚕᚖgql_serverᚋgraphᚋmodelᚐAnime(ctx, field.Selections, res)
+	return ec.marshalNAnime2ᚕᚖserverᚋgraphᚋmodelᚐAnime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Guide_animes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -894,7 +900,7 @@ func (ec *executionContext) _Guide_areas(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]*model.Area)
 	fc.Result = res
-	return ec.marshalNArea2ᚕᚖgql_serverᚋgraphᚋmodelᚐArea(ctx, field.Selections, res)
+	return ec.marshalNArea2ᚕᚖserverᚋgraphᚋmodelᚐArea(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Guide_areas(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -946,7 +952,7 @@ func (ec *executionContext) _Query_animeList(ctx context.Context, field graphql.
 	}
 	res := resTmp.([]*model.Anime)
 	fc.Result = res
-	return ec.marshalNAnime2ᚕᚖgql_serverᚋgraphᚋmodelᚐAnime(ctx, field.Selections, res)
+	return ec.marshalNAnime2ᚕᚖserverᚋgraphᚋmodelᚐAnime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_animeList(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -976,7 +982,7 @@ func (ec *executionContext) fieldContext_Query_animeList(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_animeList_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -1009,7 +1015,7 @@ func (ec *executionContext) _Query_animeListByAnimeId(ctx context.Context, field
 	}
 	res := resTmp.([]*model.Anime)
 	fc.Result = res
-	return ec.marshalNAnime2ᚕᚖgql_serverᚋgraphᚋmodelᚐAnime(ctx, field.Selections, res)
+	return ec.marshalNAnime2ᚕᚖserverᚋgraphᚋmodelᚐAnime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_animeListByAnimeId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1039,7 +1045,7 @@ func (ec *executionContext) fieldContext_Query_animeListByAnimeId(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_animeListByAnimeId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -1072,7 +1078,7 @@ func (ec *executionContext) _Query_GuideListByAnimeIdAndAreaId(ctx context.Conte
 	}
 	res := resTmp.([]*model.Guide)
 	fc.Result = res
-	return ec.marshalNGuide2ᚕᚖgql_serverᚋgraphᚋmodelᚐGuide(ctx, field.Selections, res)
+	return ec.marshalNGuide2ᚕᚖserverᚋgraphᚋmodelᚐGuide(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_GuideListByAnimeIdAndAreaId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1104,7 +1110,7 @@ func (ec *executionContext) fieldContext_Query_GuideListByAnimeIdAndAreaId(ctx c
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_GuideListByAnimeIdAndAreaId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -1178,7 +1184,7 @@ func (ec *executionContext) fieldContext_Query___type(ctx context.Context, field
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query___type_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -2747,7 +2753,7 @@ func (ec *executionContext) fieldContext___Type_fields(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field___Type_fields_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -2935,7 +2941,7 @@ func (ec *executionContext) fieldContext___Type_enumValues(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field___Type_enumValues_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3745,7 +3751,7 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) marshalNAnime2ᚕᚖgql_serverᚋgraphᚋmodelᚐAnime(ctx context.Context, sel ast.SelectionSet, v []*model.Anime) graphql.Marshaler {
+func (ec *executionContext) marshalNAnime2ᚕᚖserverᚋgraphᚋmodelᚐAnime(ctx context.Context, sel ast.SelectionSet, v []*model.Anime) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3769,7 +3775,7 @@ func (ec *executionContext) marshalNAnime2ᚕᚖgql_serverᚋgraphᚋmodelᚐAni
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOAnime2ᚖgql_serverᚋgraphᚋmodelᚐAnime(ctx, sel, v[i])
+			ret[i] = ec.marshalOAnime2ᚖserverᚋgraphᚋmodelᚐAnime(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3783,7 +3789,7 @@ func (ec *executionContext) marshalNAnime2ᚕᚖgql_serverᚋgraphᚋmodelᚐAni
 	return ret
 }
 
-func (ec *executionContext) marshalNArea2ᚕᚖgql_serverᚋgraphᚋmodelᚐArea(ctx context.Context, sel ast.SelectionSet, v []*model.Area) graphql.Marshaler {
+func (ec *executionContext) marshalNArea2ᚕᚖserverᚋgraphᚋmodelᚐArea(ctx context.Context, sel ast.SelectionSet, v []*model.Area) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3807,7 +3813,7 @@ func (ec *executionContext) marshalNArea2ᚕᚖgql_serverᚋgraphᚋmodelᚐArea
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOArea2ᚖgql_serverᚋgraphᚋmodelᚐArea(ctx, sel, v[i])
+			ret[i] = ec.marshalOArea2ᚖserverᚋgraphᚋmodelᚐArea(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3836,7 +3842,7 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNGuide2ᚕᚖgql_serverᚋgraphᚋmodelᚐGuide(ctx context.Context, sel ast.SelectionSet, v []*model.Guide) graphql.Marshaler {
+func (ec *executionContext) marshalNGuide2ᚕᚖserverᚋgraphᚋmodelᚐGuide(ctx context.Context, sel ast.SelectionSet, v []*model.Guide) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3860,7 +3866,7 @@ func (ec *executionContext) marshalNGuide2ᚕᚖgql_serverᚋgraphᚋmodelᚐGui
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOGuide2ᚖgql_serverᚋgraphᚋmodelᚐGuide(ctx, sel, v[i])
+			ret[i] = ec.marshalOGuide2ᚖserverᚋgraphᚋmodelᚐGuide(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3915,7 +3921,7 @@ func (ec *executionContext) marshalNInt2ᚕᚖint(ctx context.Context, sel ast.S
 	return ret
 }
 
-func (ec *executionContext) marshalNSpot2ᚕᚖgql_serverᚋgraphᚋmodelᚐSpot(ctx context.Context, sel ast.SelectionSet, v []*model.Spot) graphql.Marshaler {
+func (ec *executionContext) marshalNSpot2ᚕᚖserverᚋgraphᚋmodelᚐSpot(ctx context.Context, sel ast.SelectionSet, v []*model.Spot) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3939,7 +3945,7 @@ func (ec *executionContext) marshalNSpot2ᚕᚖgql_serverᚋgraphᚋmodelᚐSpot
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOSpot2ᚖgql_serverᚋgraphᚋmodelᚐSpot(ctx, sel, v[i])
+			ret[i] = ec.marshalOSpot2ᚖserverᚋgraphᚋmodelᚐSpot(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4221,14 +4227,14 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalOAnime2ᚖgql_serverᚋgraphᚋmodelᚐAnime(ctx context.Context, sel ast.SelectionSet, v *model.Anime) graphql.Marshaler {
+func (ec *executionContext) marshalOAnime2ᚖserverᚋgraphᚋmodelᚐAnime(ctx context.Context, sel ast.SelectionSet, v *model.Anime) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Anime(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOArea2ᚖgql_serverᚋgraphᚋmodelᚐArea(ctx context.Context, sel ast.SelectionSet, v *model.Area) graphql.Marshaler {
+func (ec *executionContext) marshalOArea2ᚖserverᚋgraphᚋmodelᚐArea(ctx context.Context, sel ast.SelectionSet, v *model.Area) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -4261,7 +4267,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOGuide2ᚖgql_serverᚋgraphᚋmodelᚐGuide(ctx context.Context, sel ast.SelectionSet, v *model.Guide) graphql.Marshaler {
+func (ec *executionContext) marshalOGuide2ᚖserverᚋgraphᚋmodelᚐGuide(ctx context.Context, sel ast.SelectionSet, v *model.Guide) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -4284,7 +4290,7 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
-func (ec *executionContext) marshalOSpot2ᚖgql_serverᚋgraphᚋmodelᚐSpot(ctx context.Context, sel ast.SelectionSet, v *model.Spot) graphql.Marshaler {
+func (ec *executionContext) marshalOSpot2ᚖserverᚋgraphᚋmodelᚐSpot(ctx context.Context, sel ast.SelectionSet, v *model.Spot) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

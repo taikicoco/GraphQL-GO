@@ -1,4 +1,4 @@
-module gql_server
+module server
 
 go 1.20
 

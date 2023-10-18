@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gql_server/graph"
+	"server/graph"
 	"log"
 	"net/http"
 	"os"
