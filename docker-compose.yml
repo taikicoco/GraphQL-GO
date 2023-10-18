@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/app
-    working_dir: /app/gql_server
+    working_dir: /app/server
     ports:
       - "1323:1323"
     restart: always
@@ -16,6 +16,7 @@ services:
       PORT: "1323"
       DRIVER: "mysql"
       DATASOURCE: "user:password@tcp(mysql)/db?charset=utf8mb4&parseTime=true"
+    command: ["make", "run"]
     depends_on:
       - mysql
 
