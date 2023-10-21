@@ -1,7 +1,7 @@
 type Anime {
   anime_id: Int!
   name: String!
-  areas: [Area]!
+  areas: [Area]
 }
 
 type Area {
@@ -23,7 +23,7 @@ type Guide {
 }
 
 type Query {
-  animeList(name: String!): [Anime]!
+  animeList: [Anime]!
   animeListByAnimeId(anime_id: [Int]!): [Anime]!
   GuideListByAnimeIdAndAreaId(area_id: [Int]!, anime_id: [Int]!): [Guide]!
 }
