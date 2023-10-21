@@ -3,25 +3,6 @@
 package model
 
 type Anime struct {
-	AnimeID int     `json:"anime_id"`
-	Name    string  `json:"name"`
-	Areas   []*Area `json:"areas,omitempty"`
-}
-
-type Area struct {
-	AreaID int     `json:"area_id"`
-	Name   string  `json:"name"`
-	Spots  []*Spot `json:"spots"`
-}
-
-type Guide struct {
-	GuideID int      `json:"guide_id"`
-	Name    string   `json:"name"`
-	Animes  []*Anime `json:"animes"`
-	Areas   []*Area  `json:"areas"`
-}
-
-type Spot struct {
-	SpotID int    `json:"spot_id"`
-	Name   string `json:"name"`
+	AnimeID int    `json:"animeID"`
+	Name    string `json:"name"`
 }

@@ -1,0 +1,10 @@
+type Anime {
+    animeID: Int!
+    name: String!
+    # areas: [Area]
+}
+
+extend type Query {
+    animeListByAnimeID(animeID: [Int]!): [Anime]!
+    animeList: [Anime]!
+}
