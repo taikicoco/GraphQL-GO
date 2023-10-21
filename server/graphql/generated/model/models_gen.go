@@ -5,7 +5,7 @@ package model
 type Anime struct {
 	AnimeID int     `json:"anime_id"`
 	Name    string  `json:"name"`
-	Areas   []*Area `json:"areas"`
+	Areas   []*Area `json:"areas,omitempty"`
 }
 
 type Area struct {
