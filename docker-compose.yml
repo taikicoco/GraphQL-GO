@@ -32,7 +32,8 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: passwordroot
     volumes:
-      - "mysql-db:/var/lib/mysql"
+      - mysql-db:/var/lib/mysql
+      - ./db/seed:/seed
 
 volumes:
   mysql-db:
