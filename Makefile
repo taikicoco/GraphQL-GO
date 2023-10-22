@@ -20,10 +20,13 @@ MYSQL_PASSWORD := password
 MYSQL_DB := db
 
 mysql:
-	docker compose exec mysql mysql -uroot -ppasswordroot -Ddb
+	docker compose exec mysql mysql -u$(MYSQL_USER) -p$(MYSQL_PASSWORD) -D$(MYSQL_DB)
 
 migrate/new:
 	echo '-- +goose Up' > db/migration/_.sql
 
 migrate/up:
 	docker-compose exec -T backend sh ../db/migration/script/migrate-up.sh 
+
+seed:
+	docker-compose exec mysql mysql -u$(MYSQL_USER) -p$(MYSQL_PASSWORD) -D$(MYSQL_DB) -e "source /seed/seed.sql"

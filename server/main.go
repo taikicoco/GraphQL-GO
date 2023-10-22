@@ -4,22 +4,32 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"server/graphql/resolver"
 	"server/graphql/generated"
+	"server/graphql/resolver"
+	"server/repository"
+	"server/usecase"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 )
 
-const defaultPort = "8080"
+const defaultPort = "1323"
 
 func main() {
+	db, err := repository.Open()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolver.Resolver{}}))
+	anime := usecase.NewAnime(db)
+	resolver := resolver.NewResolver(anime)
+	gc := generated.Config{Resolvers: resolver}
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(gc))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

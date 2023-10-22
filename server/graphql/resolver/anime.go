@@ -17,15 +17,17 @@ func (r *queryResolver) AnimeListByAnimeID(ctx context.Context, animeID []*int) 
 
 // AnimeList is the resolver for the animeList field.
 func (r *queryResolver) AnimeList(ctx context.Context) ([]*model.Anime, error) {
-	animes := []*model.Anime{
-		{
-			AnimeID: 1,
-			Name:    "anime1",
-		},
-		{
-			AnimeID: 2,
-			Name:    "anime2",
-		},
+	res, err := r.anime.AnimeList(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	animes := make([]*model.Anime, len(res))
+	for i, v := range res {
+		animes[i] = &model.Anime{
+			AnimeID: v.AnimeID,
+			Name:    v.Name,			
+		}
 	}
 	return animes, nil
 }
