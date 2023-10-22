@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"server/model"
 	"server/repository"
 
@@ -20,7 +19,6 @@ func NewAnime(db *sqlx.DB) *Anime {
 	}
 }
 func (a *Anime) AnimeList(ctx context.Context) ([]*model.Anime, error) {
-	fmt.Println("AnimeList")
 	animes, err := a.animeRepo.GetAll(ctx, a.db)
 	if err != nil {
 		return nil, err
