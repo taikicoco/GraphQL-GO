@@ -28,6 +28,17 @@ func (r *queryResolver) AllAnime(ctx context.Context) ([]*model.Anime, error) {
 }
 
 // AllAnimeByID is the resolver for the allAnimeByID field.
-func (r *queryResolver) AllAnimeByID(ctx context.Context, animeID int) ([]*model.Anime, error) {
-	panic(fmt.Errorf("not implemented: AllAnimeByID - allAnimeByID"))
+func (r *queryResolver) AnimeByID(ctx context.Context, animeID int) (*model.Anime, error) {
+	fmt.Println("kdfjkdfjkl")
+	res, err := r.anime.GetAnimeByID(ctx, animeID)
+	if err != nil {
+		return nil, err
+	}
+
+	anime := &model.Anime{
+		AnimeID: res.AnimeID,
+		Name:    res.Name,
+	}
+
+	return anime, nil
 }
