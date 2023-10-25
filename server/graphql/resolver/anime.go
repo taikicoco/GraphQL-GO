@@ -6,17 +6,11 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 	"server/graphql/generated/model"
 )
 
-// AnimeListByAnimeID is the resolver for the animeListByAnimeId field.
-func (r *queryResolver) AnimeListByAnimeID(ctx context.Context, animeID []*int) ([]*model.Anime, error) {
-	panic(fmt.Errorf("not implemented: AnimeListByAnimeID - animeListByAnimeId"))
-}
-
-// AnimeList is the resolver for the animeList field.
-func (r *queryResolver) AnimeList(ctx context.Context) ([]*model.Anime, error) {
+// AllAnime is the resolver for the allAnime field.
+func (r *queryResolver) AllAnime(ctx context.Context) ([]*model.Anime, error) {
 	res, err := r.anime.AnimeList(ctx)
 	if err != nil {
 		return nil, err
@@ -26,8 +20,23 @@ func (r *queryResolver) AnimeList(ctx context.Context) ([]*model.Anime, error) {
 	for i, v := range res {
 		animes[i] = &model.Anime{
 			AnimeID: v.AnimeID,
-			Name:    v.Name,			
+			Name:    v.Name,
 		}
 	}
 	return animes, nil
+}
+
+// AllAnimeByID is the resolver for the allAnimeByID field.
+func (r *queryResolver) AnimeByID(ctx context.Context, animeID int) (*model.Anime, error) {
+	res, err := r.anime.GetAnimeByID(ctx, animeID)
+	if err != nil {
+		return nil, err
+	}
+
+	anime := &model.Anime{
+		AnimeID: res.AnimeID,
+		Name:    res.Name,
+	}
+
+	return anime, nil
 }
