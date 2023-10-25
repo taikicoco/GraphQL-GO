@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"server/model"
 	"server/repository"
 
@@ -29,7 +28,6 @@ func (a *Anime) AnimeList(ctx context.Context) ([]*model.Anime, error) {
 }
 
 func (a *Anime) GetAnimeByID(ctx context.Context, animeID int) (*model.Anime, error) {
-	fmt.Println("==fdfd======")
 	anime, err := a.animeRepo.GetByID(ctx, a.db, animeID)
 	if err != nil {
 		return nil, err

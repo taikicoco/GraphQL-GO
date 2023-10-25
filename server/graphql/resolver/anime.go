@@ -6,7 +6,6 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 	"server/graphql/generated/model"
 )
 
@@ -29,7 +28,6 @@ func (r *queryResolver) AllAnime(ctx context.Context) ([]*model.Anime, error) {
 
 // AllAnimeByID is the resolver for the allAnimeByID field.
 func (r *queryResolver) AnimeByID(ctx context.Context, animeID int) (*model.Anime, error) {
-	fmt.Println("kdfjkdfjkl")
 	res, err := r.anime.GetAnimeByID(ctx, animeID)
 	if err != nil {
 		return nil, err
