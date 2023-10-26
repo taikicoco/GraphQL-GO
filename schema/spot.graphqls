@@ -1,0 +1,12 @@
+type Spot {
+    spotId: Int!
+    name: String!
+    animeImgUrl: String
+    realImgUrl: String
+    address: String
+}
+
+extend type Query {
+    spots: [Spot]
+    spot(spotId: Int!): Spot
+}

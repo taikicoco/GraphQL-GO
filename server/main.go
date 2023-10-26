@@ -27,7 +27,9 @@ func main() {
 	}
 
 	anime := usecase.NewAnime(db)
-	resolver := resolver.NewResolver(anime)
+	spot := usecase.NewSpot(db)
+	prefecture := usecase.NewPrefecture(db)
+	resolver := resolver.NewResolver(anime, spot, prefecture)
 	gc := generated.Config{Resolvers: resolver}
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(gc))
 

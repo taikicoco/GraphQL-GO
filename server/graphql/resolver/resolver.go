@@ -8,10 +8,14 @@ import "server/usecase"
 
 type Resolver struct{
 	anime *usecase.Anime
+	spot *usecase.Spot
+	prefecture *usecase.Prefecture
 }
 
-func NewResolver(anime *usecase.Anime) *Resolver {
+func NewResolver(anime *usecase.Anime, spot *usecase.Spot, prefecture *usecase.Prefecture) *Resolver {
 	return &Resolver{
 		anime: anime,
+		spot: spot,
+		prefecture: prefecture,
 	}
 }
