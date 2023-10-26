@@ -1,8 +1,7 @@
 type Prefecture {
     prefectureId: Int!
-    animeId: Int!
     name: String!
-    spot: [Spot!]!
+    spot: [Spot!]
 }
 
 extend type Query {
