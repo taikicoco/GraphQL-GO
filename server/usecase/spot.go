@@ -34,3 +34,11 @@ func (a *Spot) GetSpotByID(ctx context.Context, spotID int) (*model.Spot, error)
 	}
 	return spot, nil
 }
+
+func (s *Spot) GetSpotByPrefectureID(ctx context.Context, animeId int, prefectureId int) ([]*model.Spot, error) {
+	spots, err := s.spotRepo.GetByPrefectureID(ctx, s.db, animeId, prefectureId)
+	if err != nil {
+		return nil, err
+	}
+	return spots, nil
+}
