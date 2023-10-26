@@ -1,0 +1,11 @@
+type Prefecture {
+    prefectureId: Int!
+    animeId: Int!
+    name: String!
+    spot: [Spot!]!
+}
+
+extend type Query {
+    prefecture(prefectureId: Int!): Prefecture
+    prefectures: [Prefecture!]
+}
