@@ -3,7 +3,7 @@
 package model
 
 type Anime struct {
-	AnimeID int    `json:"animeID"`
+	AnimeID int    `json:"animeId"`
 	Name    string `json:"name"`
 }
 

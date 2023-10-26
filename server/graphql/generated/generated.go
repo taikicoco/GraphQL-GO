@@ -96,7 +96,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Anime.animeID":
+	case "Anime.animeId":
 		if e.complexity.Anime.AnimeID == nil {
 			break
 		}
@@ -313,7 +313,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	{Name: "../../../schema/anime.graphqls", Input: `type Anime {
-    animeID: Int!
+    animeId: Int!
     name: String!
 }
 
@@ -454,8 +454,8 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Anime_animeID(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Anime_animeID(ctx, field)
+func (ec *executionContext) _Anime_animeId(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Anime_animeId(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -485,7 +485,7 @@ func (ec *executionContext) _Anime_animeID(ctx context.Context, field graphql.Co
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Anime_animeID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Anime_animeId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Anime",
 		Field:      field,
@@ -722,8 +722,8 @@ func (ec *executionContext) fieldContext_Query_animes(ctx context.Context, field
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "animeID":
-				return ec.fieldContext_Anime_animeID(ctx, field)
+			case "animeId":
+				return ec.fieldContext_Anime_animeId(ctx, field)
 			case "name":
 				return ec.fieldContext_Anime_name(ctx, field)
 			}
@@ -769,8 +769,8 @@ func (ec *executionContext) fieldContext_Query_anime(ctx context.Context, field 
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "animeID":
-				return ec.fieldContext_Anime_animeID(ctx, field)
+			case "animeId":
+				return ec.fieldContext_Anime_animeId(ctx, field)
 			case "name":
 				return ec.fieldContext_Anime_name(ctx, field)
 			}
@@ -3149,8 +3149,8 @@ func (ec *executionContext) _Anime(ctx context.Context, sel ast.SelectionSet, ob
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Anime")
-		case "animeID":
-			out.Values[i] = ec._Anime_animeID(ctx, field, obj)
+		case "animeId":
+			out.Values[i] = ec._Anime_animeId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

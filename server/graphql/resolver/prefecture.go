@@ -25,7 +25,6 @@ func (r *queryResolver) Prefecture(ctx context.Context, prefectureID int) (*mode
 
 // Prefectures is the resolver for the prefectures field.
 func (r *queryResolver) Prefectures(ctx context.Context) ([]*model.Prefecture, error) {
-
 	res, err := r.prefecture.PrefectureList(ctx)
 	if err != nil {
 		return nil, err
