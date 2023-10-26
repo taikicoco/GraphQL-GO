@@ -6,8 +6,27 @@ package resolver
 
 import (
 	"context"
+	"server/graphql/generated"
 	"server/graphql/generated/model"
 )
+
+// Prefecture is the resolver for the prefecture field.
+func (r *animeResolver) Prefecture(ctx context.Context, obj *model.Anime) ([]*model.Prefecture, error) {
+	res, err := r.prefecture.GetPrefectureByAnimeID(ctx, obj.AnimeID)
+	if err != nil {
+		return nil, err
+	}
+
+	prefectures := make([]*model.Prefecture, len(res))
+	for i, v := range res {
+		prefectures[i] = &model.Prefecture{
+			PrefectureID: v.PrefectureID,
+			AnimeID:      &obj.AnimeID,
+			Name:         v.Name,
+		}
+	}
+	return prefectures, nil
+}
 
 // Animes is the resolver for the animes field.
 func (r *queryResolver) Animes(ctx context.Context) ([]*model.Anime, error) {
@@ -40,3 +59,8 @@ func (r *queryResolver) Anime(ctx context.Context, animeID int) (*model.Anime, e
 
 	return anime, nil
 }
+
+// Anime returns generated.AnimeResolver implementation.
+func (r *Resolver) Anime() generated.AnimeResolver { return &animeResolver{r} }
+
+type animeResolver struct{ *Resolver }

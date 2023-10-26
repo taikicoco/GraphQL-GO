@@ -3,13 +3,16 @@
 package model
 
 type Anime struct {
-	AnimeID int    `json:"animeId"`
-	Name    string `json:"name"`
+	AnimeID    int           `json:"animeId"`
+	Name       string        `json:"name"`
+	ImgURL     *string       `json:"imgUrl,omitempty"`
+	Prefecture []*Prefecture `json:"prefecture,omitempty"`
 }
 
 type Prefecture struct {
 	PrefectureID int     `json:"prefectureId"`
 	Name         string  `json:"name"`
+	AnimeID      *int    `json:"animeId,omitempty"`
 	Spot         []*Spot `json:"spot,omitempty"`
 }
 

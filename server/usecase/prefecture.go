@@ -34,3 +34,11 @@ func (a *Prefecture) GetPrefectureByID(ctx context.Context, prefectureID int) (*
 	}
 	return prefecture, nil
 }
+
+func (sa *Prefecture) GetPrefectureByAnimeID(ctx context.Context, animeId int) ([]*model.Prefecture, error) {
+	prefecture, err := sa.prefectureRepo.GetByAnimeID(ctx, sa.db, animeId)
+	if err != nil {
+		return nil, err
+	}
+	return prefecture, nil
+}
