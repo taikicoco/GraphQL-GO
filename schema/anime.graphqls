@@ -1,10 +1,9 @@
 type Anime {
     animeID: Int!
     name: String!
-    # areas: [Area]
 }
 
 extend type Query {
-    allAnime: [Anime]!
-    AnimeByID(animeID: Int!): Anime
+    animes: [Anime]!
+    anime(animeID: Int!): Anime
 }

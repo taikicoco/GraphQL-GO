@@ -48,15 +48,34 @@ type ComplexityRoot struct {
 		Name    func(childComplexity int) int
 	}
 
+	Prefecture struct {
+		AnimeID      func(childComplexity int) int
+		Name         func(childComplexity int) int
+		PrefectureID func(childComplexity int) int
+		Spot         func(childComplexity int) int
+	}
+
 	Query struct {
-		AllAnime  func(childComplexity int) int
-		AnimeByID func(childComplexity int, animeID int) int
+		Anime  func(childComplexity int, animeID int) int
+		Animes func(childComplexity int) int
+		Spot   func(childComplexity int, spotID int) int
+		Spots  func(childComplexity int) int
+	}
+
+	Spot struct {
+		Address     func(childComplexity int) int
+		AnimeImgURL func(childComplexity int) int
+		Name        func(childComplexity int) int
+		RealImgURL  func(childComplexity int) int
+		SpotID      func(childComplexity int) int
 	}
 }
 
 type QueryResolver interface {
-	AllAnime(ctx context.Context) ([]*model.Anime, error)
-	AnimeByID(ctx context.Context, animeID int) (*model.Anime, error)
+	Animes(ctx context.Context) ([]*model.Anime, error)
+	Anime(ctx context.Context, animeID int) (*model.Anime, error)
+	Spots(ctx context.Context) ([]*model.Spot, error)
+	Spot(ctx context.Context, spotID int) (*model.Spot, error)
 }
 
 type executableSchema struct {
@@ -88,24 +107,106 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Anime.Name(childComplexity), true
 
-	case "Query.allAnime":
-		if e.complexity.Query.AllAnime == nil {
+	case "Prefecture.animeId":
+		if e.complexity.Prefecture.AnimeID == nil {
 			break
 		}
 
-		return e.complexity.Query.AllAnime(childComplexity), true
+		return e.complexity.Prefecture.AnimeID(childComplexity), true
 
-	case "Query.AnimeByID":
-		if e.complexity.Query.AnimeByID == nil {
+	case "Prefecture.name":
+		if e.complexity.Prefecture.Name == nil {
 			break
 		}
 
-		args, err := ec.field_Query_AnimeByID_args(context.TODO(), rawArgs)
+		return e.complexity.Prefecture.Name(childComplexity), true
+
+	case "Prefecture.prefectureId":
+		if e.complexity.Prefecture.PrefectureID == nil {
+			break
+		}
+
+		return e.complexity.Prefecture.PrefectureID(childComplexity), true
+
+	case "Prefecture.spot":
+		if e.complexity.Prefecture.Spot == nil {
+			break
+		}
+
+		return e.complexity.Prefecture.Spot(childComplexity), true
+
+	case "Query.anime":
+		if e.complexity.Query.Anime == nil {
+			break
+		}
+
+		args, err := ec.field_Query_anime_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.AnimeByID(childComplexity, args["animeID"].(int)), true
+		return e.complexity.Query.Anime(childComplexity, args["animeID"].(int)), true
+
+	case "Query.animes":
+		if e.complexity.Query.Animes == nil {
+			break
+		}
+
+		return e.complexity.Query.Animes(childComplexity), true
+
+	case "Query.spot":
+		if e.complexity.Query.Spot == nil {
+			break
+		}
+
+		args, err := ec.field_Query_spot_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Spot(childComplexity, args["spotId"].(int)), true
+
+	case "Query.spots":
+		if e.complexity.Query.Spots == nil {
+			break
+		}
+
+		return e.complexity.Query.Spots(childComplexity), true
+
+	case "Spot.address":
+		if e.complexity.Spot.Address == nil {
+			break
+		}
+
+		return e.complexity.Spot.Address(childComplexity), true
+
+	case "Spot.animeImgUrl":
+		if e.complexity.Spot.AnimeImgURL == nil {
+			break
+		}
+
+		return e.complexity.Spot.AnimeImgURL(childComplexity), true
+
+	case "Spot.name":
+		if e.complexity.Spot.Name == nil {
+			break
+		}
+
+		return e.complexity.Spot.Name(childComplexity), true
+
+	case "Spot.realImgUrl":
+		if e.complexity.Spot.RealImgURL == nil {
+			break
+		}
+
+		return e.complexity.Spot.RealImgURL(childComplexity), true
+
+	case "Spot.spotId":
+		if e.complexity.Spot.SpotID == nil {
+			break
+		}
+
+		return e.complexity.Spot.SpotID(childComplexity), true
 
 	}
 	return 0, false
@@ -199,16 +300,35 @@ var sources = []*ast.Source{
 	{Name: "../../../schema/anime.graphqls", Input: `type Anime {
     animeID: Int!
     name: String!
-    # areas: [Area]
 }
 
 extend type Query {
-    allAnime: [Anime]!
-    AnimeByID(animeID: Int!): Anime
+    animes: [Anime]!
+    anime(animeID: Int!): Anime
+}
+`, BuiltIn: false},
+	{Name: "../../../schema/prefecture.graphqls", Input: `type Prefecture {
+    prefectureId: Int!
+    animeId: Int!
+    name: String!
+    spot: [Spot!]!
 }
 `, BuiltIn: false},
 	{Name: "../../../schema/schema.graphqls", Input: `type Query
 # type Mutation
+`, BuiltIn: false},
+	{Name: "../../../schema/spot.graphqls", Input: `type Spot {
+    spotId: Int!
+    name: String!
+    animeImgUrl: String
+    realImgUrl: String
+    address: String
+}
+
+extend type Query {
+    spots: [Spot]
+    spot(spotId: Int!): Spot
+}
 `, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -217,7 +337,22 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Query_AnimeByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["name"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_anime_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
@@ -232,18 +367,18 @@ func (ec *executionContext) field_Query_AnimeByID_args(ctx context.Context, rawA
 	return args, nil
 }
 
-func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_spot_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["name"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	var arg0 int
+	if tmp, ok := rawArgs["spotId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spotId"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["name"] = arg0
+	args["spotId"] = arg0
 	return args, nil
 }
 
@@ -373,8 +508,8 @@ func (ec *executionContext) fieldContext_Anime_name(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_allAnime(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_allAnime(ctx, field)
+func (ec *executionContext) _Prefecture_prefectureId(ctx context.Context, field graphql.CollectedField, obj *model.Prefecture) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Prefecture_prefectureId(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -387,7 +522,195 @@ func (ec *executionContext) _Query_allAnime(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AllAnime(rctx)
+		return obj.PrefectureID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Prefecture_prefectureId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Prefecture",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Prefecture_animeId(ctx context.Context, field graphql.CollectedField, obj *model.Prefecture) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Prefecture_animeId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AnimeID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Prefecture_animeId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Prefecture",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Prefecture_name(ctx context.Context, field graphql.CollectedField, obj *model.Prefecture) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Prefecture_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Prefecture_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Prefecture",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Prefecture_spot(ctx context.Context, field graphql.CollectedField, obj *model.Prefecture) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Prefecture_spot(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Spot, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Spot)
+	fc.Result = res
+	return ec.marshalNSpot2ᚕᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐSpotᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Prefecture_spot(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Prefecture",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "spotId":
+				return ec.fieldContext_Spot_spotId(ctx, field)
+			case "name":
+				return ec.fieldContext_Spot_name(ctx, field)
+			case "animeImgUrl":
+				return ec.fieldContext_Spot_animeImgUrl(ctx, field)
+			case "realImgUrl":
+				return ec.fieldContext_Spot_realImgUrl(ctx, field)
+			case "address":
+				return ec.fieldContext_Spot_address(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Spot", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_animes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_animes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Animes(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -404,7 +727,7 @@ func (ec *executionContext) _Query_allAnime(ctx context.Context, field graphql.C
 	return ec.marshalNAnime2ᚕᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐAnime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_allAnime(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_animes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -423,8 +746,8 @@ func (ec *executionContext) fieldContext_Query_allAnime(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_AnimeByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_AnimeByID(ctx, field)
+func (ec *executionContext) _Query_anime(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_anime(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -437,7 +760,7 @@ func (ec *executionContext) _Query_AnimeByID(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AnimeByID(rctx, fc.Args["animeID"].(int))
+		return ec.resolvers.Query().Anime(rctx, fc.Args["animeID"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -451,7 +774,7 @@ func (ec *executionContext) _Query_AnimeByID(ctx context.Context, field graphql.
 	return ec.marshalOAnime2ᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐAnime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_AnimeByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_anime(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -474,7 +797,124 @@ func (ec *executionContext) fieldContext_Query_AnimeByID(ctx context.Context, fi
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_AnimeByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_anime_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_spots(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_spots(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Spots(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Spot)
+	fc.Result = res
+	return ec.marshalOSpot2ᚕᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐSpot(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_spots(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "spotId":
+				return ec.fieldContext_Spot_spotId(ctx, field)
+			case "name":
+				return ec.fieldContext_Spot_name(ctx, field)
+			case "animeImgUrl":
+				return ec.fieldContext_Spot_animeImgUrl(ctx, field)
+			case "realImgUrl":
+				return ec.fieldContext_Spot_realImgUrl(ctx, field)
+			case "address":
+				return ec.fieldContext_Spot_address(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Spot", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_spot(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_spot(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Spot(rctx, fc.Args["spotId"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Spot)
+	fc.Result = res
+	return ec.marshalOSpot2ᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐSpot(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_spot(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "spotId":
+				return ec.fieldContext_Spot_spotId(ctx, field)
+			case "name":
+				return ec.fieldContext_Spot_name(ctx, field)
+			case "animeImgUrl":
+				return ec.fieldContext_Spot_animeImgUrl(ctx, field)
+			case "realImgUrl":
+				return ec.fieldContext_Spot_realImgUrl(ctx, field)
+			case "address":
+				return ec.fieldContext_Spot_address(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Spot", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_spot_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -605,6 +1045,217 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Spot_spotId(ctx context.Context, field graphql.CollectedField, obj *model.Spot) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Spot_spotId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SpotID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Spot_spotId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Spot",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Spot_name(ctx context.Context, field graphql.CollectedField, obj *model.Spot) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Spot_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Spot_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Spot",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Spot_animeImgUrl(ctx context.Context, field graphql.CollectedField, obj *model.Spot) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Spot_animeImgUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AnimeImgURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Spot_animeImgUrl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Spot",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Spot_realImgUrl(ctx context.Context, field graphql.CollectedField, obj *model.Spot) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Spot_realImgUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RealImgURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Spot_realImgUrl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Spot",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Spot_address(ctx context.Context, field graphql.CollectedField, obj *model.Spot) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Spot_address(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Address, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Spot_address(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Spot",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2435,6 +3086,60 @@ func (ec *executionContext) _Anime(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
+var prefectureImplementors = []string{"Prefecture"}
+
+func (ec *executionContext) _Prefecture(ctx context.Context, sel ast.SelectionSet, obj *model.Prefecture) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, prefectureImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Prefecture")
+		case "prefectureId":
+			out.Values[i] = ec._Prefecture_prefectureId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "animeId":
+			out.Values[i] = ec._Prefecture_animeId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Prefecture_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "spot":
+			out.Values[i] = ec._Prefecture_spot(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -2454,7 +3159,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "allAnime":
+		case "animes":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -2463,7 +3168,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_allAnime(ctx, field)
+				res = ec._Query_animes(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -2476,7 +3181,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "AnimeByID":
+		case "anime":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -2485,7 +3190,45 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_AnimeByID(ctx, field)
+				res = ec._Query_anime(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "spots":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_spots(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "spot":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_spot(ctx, field)
 				return res
 			}
 
@@ -2503,6 +3246,56 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var spotImplementors = []string{"Spot"}
+
+func (ec *executionContext) _Spot(ctx context.Context, sel ast.SelectionSet, obj *model.Spot) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, spotImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Spot")
+		case "spotId":
+			out.Values[i] = ec._Spot_spotId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Spot_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "animeImgUrl":
+			out.Values[i] = ec._Spot_animeImgUrl(ctx, field, obj)
+		case "realImgUrl":
+			out.Values[i] = ec._Spot_realImgUrl(ctx, field, obj)
+		case "address":
+			out.Values[i] = ec._Spot_address(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2920,6 +3713,60 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) marshalNSpot2ᚕᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐSpotᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Spot) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNSpot2ᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐSpot(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNSpot2ᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐSpot(ctx context.Context, sel ast.SelectionSet, v *model.Spot) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Spot(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3219,6 +4066,54 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOSpot2ᚕᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐSpot(ctx context.Context, sel ast.SelectionSet, v []*model.Spot) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOSpot2ᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐSpot(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOSpot2ᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐSpot(ctx context.Context, sel ast.SelectionSet, v *model.Spot) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Spot(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
