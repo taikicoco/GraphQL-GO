@@ -6,3 +6,17 @@ type Anime struct {
 	AnimeID int    `json:"animeID"`
 	Name    string `json:"name"`
 }
+
+type Prefecture struct {
+	PrefectureID int     `json:"prefectureId"`
+	Name         string  `json:"name"`
+	Spot         []*Spot `json:"spot,omitempty"`
+}
+
+type Spot struct {
+	SpotID      int     `json:"spotId"`
+	Name        string  `json:"name"`
+	AnimeImgURL *string `json:"animeImgUrl,omitempty"`
+	RealImgURL  *string `json:"realImgUrl,omitempty"`
+	Address     *string `json:"address,omitempty"`
+}
