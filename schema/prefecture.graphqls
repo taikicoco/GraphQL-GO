@@ -1,6 +1,7 @@
 type Prefecture {
     prefectureId: Int!
     name: String!
+    animeId: Int
     spot: [Spot!]
 }
 

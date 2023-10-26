@@ -1,6 +1,8 @@
 type Anime {
     animeId: Int!
     name: String!
+    imgUrl: String
+    prefecture:[Prefecture!]
 }
 
 extend type Query {
