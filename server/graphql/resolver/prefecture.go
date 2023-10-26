@@ -6,8 +6,15 @@ package resolver
 
 import (
 	"context"
+	"fmt"
+	"server/graphql/generated"
 	"server/graphql/generated/model"
 )
+
+// Spot is the resolver for the spot field.
+func (r *prefectureResolver) Spot(ctx context.Context, obj *model.Prefecture) ([]*model.Spot, error) {
+	panic(fmt.Errorf("not implemented: Spot - spot"))
+}
 
 // Prefecture is the resolver for the prefecture field.
 func (r *queryResolver) Prefecture(ctx context.Context, prefectureID int) (*model.Prefecture, error) {
@@ -39,3 +46,8 @@ func (r *queryResolver) Prefectures(ctx context.Context) ([]*model.Prefecture, e
 	}
 	return prefectures, nil
 }
+
+// Prefecture returns generated.PrefectureResolver implementation.
+func (r *Resolver) Prefecture() generated.PrefectureResolver { return &prefectureResolver{r} }
+
+type prefectureResolver struct{ *Resolver }
