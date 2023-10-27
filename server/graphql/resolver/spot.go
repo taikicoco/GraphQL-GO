@@ -21,9 +21,9 @@ func (r *queryResolver) Spots(ctx context.Context) ([]*model.Spot, error) {
 		spots[i] = &model.Spot{
 			SpotID:      v.SpotID,
 			Name:        v.Name,
-			RealImgURL:  v.RealImgURL,
-			AnimeImgURL: v.AnimeImgURL,
-			Address:     v.Address,
+			RealImgURL:  &v.RealImgURL,
+			AnimeImgURL: &v.AnimeImgURL,
+			Address:     &v.Address,
 		}
 	}
 
@@ -40,9 +40,9 @@ func (r *queryResolver) Spot(ctx context.Context, spotID int) (*model.Spot, erro
 	spot := &model.Spot{
 		SpotID:      res.SpotID,
 		Name:        res.Name,
-		RealImgURL:  res.RealImgURL,
-		AnimeImgURL: res.AnimeImgURL,
-		Address:     res.Address,
+		RealImgURL:  &res.RealImgURL,
+		AnimeImgURL: &res.AnimeImgURL,
+		Address:     &res.Address,
 	}
 
 	return spot, nil

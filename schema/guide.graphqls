@@ -1,0 +1,15 @@
+type Guide {
+    guideId: Int!
+    name:String!
+    age: Int!
+    comment: String
+    stance: String
+    favoriteCharacter:String
+    gender:Gender!
+    country:Country!
+}
+
+extend type Query {
+    guides: [Guide!]
+    guide(guideId: Int!): Guide
+}

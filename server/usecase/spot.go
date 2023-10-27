@@ -9,7 +9,7 @@ import (
 )
 
 type Spot struct {
-	db        *sqlx.DB
+	db       *sqlx.DB
 	spotRepo *repository.SpotRepository
 }
 

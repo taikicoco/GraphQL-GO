@@ -22,9 +22,9 @@ func (r *prefectureResolver) Spot(ctx context.Context, obj *model.Prefecture) ([
 		spot[i] = &model.Spot{
 			SpotID:      v.SpotID,
 			Name:        v.Name,
-			AnimeImgURL: v.AnimeImgURL,
-			RealImgURL:  v.RealImgURL,
-			Address:     v.Address,
+			AnimeImgURL: &v.AnimeImgURL,
+			RealImgURL:  &v.RealImgURL,
+			Address:     &v.Address,
 		}
 	}
 	return spot, nil

@@ -18,8 +18,10 @@ func newResolvers(db *sqlx.DB) *resolver.Resolver {
 	anime := usecase.NewAnime(db)
 	spot := usecase.NewSpot(db)
 	prefecture := usecase.NewPrefecture(db)
+	gender := usecase.NewGender(db)
+	country := usecase.NewCountry(db)
 
-	return resolver.NewResolver(anime, spot, prefecture)
+	return resolver.NewResolver(anime, spot, prefecture, gender, country)
 }
 
 func main() {
@@ -27,7 +29,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 
 	const defaultPort = "1323"
 	port := os.Getenv("PORT")
