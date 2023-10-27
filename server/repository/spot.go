@@ -43,4 +43,3 @@ func (r *SpotRepository) GetByPrefectureID(ctx context.Context, db *sqlx.DB, ani
 	}
 	return spots, nil
 }
-

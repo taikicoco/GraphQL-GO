@@ -6,16 +6,16 @@ import "server/usecase"
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 
-type Resolver struct{
-	anime *usecase.Anime
-	spot *usecase.Spot
+type Resolver struct {
+	anime      *usecase.Anime
+	spot       *usecase.Spot
 	prefecture *usecase.Prefecture
 }
 
 func NewResolver(anime *usecase.Anime, spot *usecase.Spot, prefecture *usecase.Prefecture) *Resolver {
 	return &Resolver{
-		anime: anime,
-		spot: spot,
+		anime:      anime,
+		spot:       spot,
 		prefecture: prefecture,
 	}
 }

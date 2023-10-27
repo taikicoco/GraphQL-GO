@@ -9,7 +9,7 @@ import (
 )
 
 type Prefecture struct {
-	db        *sqlx.DB
+	db             *sqlx.DB
 	prefectureRepo *repository.PrefectureRepository
 }
 

@@ -28,7 +28,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-
 	const defaultPort = "1323"
 	port := os.Getenv("PORT")
 	if port == "" {
