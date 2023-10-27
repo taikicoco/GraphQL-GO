@@ -9,6 +9,28 @@ type Anime struct {
 	Prefecture []*Prefecture `json:"prefecture,omitempty"`
 }
 
+type Country struct {
+	CountryID int     `json:"countryId"`
+	Name      string  `json:"name"`
+	ImgURL    *string `json:"imgUrl,omitempty"`
+}
+
+type Gender struct {
+	GenderID int    `json:"genderId"`
+	Gender   string `json:"gender"`
+}
+
+type Guide struct {
+	GuideID           int      `json:"guideId"`
+	Name              string   `json:"name"`
+	Age               int      `json:"age"`
+	Comment           *string  `json:"comment,omitempty"`
+	Stance            *string  `json:"stance,omitempty"`
+	FavoriteCharacter *string  `json:"favoriteCharacter,omitempty"`
+	Gender            *Gender  `json:"gender"`
+	Country           *Country `json:"country"`
+}
+
 type Prefecture struct {
 	PrefectureID int     `json:"prefectureId"`
 	Name         string  `json:"name"`
