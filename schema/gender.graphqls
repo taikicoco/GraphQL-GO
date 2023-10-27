@@ -4,6 +4,6 @@ type Gender {
 }
 
 extend type Query {
-    genders: Gender
+    genders: [Gender!]
     gender(genderId:Int!): Gender
 }
