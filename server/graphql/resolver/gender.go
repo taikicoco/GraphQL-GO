@@ -6,16 +6,38 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 	"server/graphql/generated/model"
 )
 
 // Genders is the resolver for the genders field.
-func (r *queryResolver) Genders(ctx context.Context) (*model.Gender, error) {
-	panic(fmt.Errorf("not implemented: Genders - genders"))
+func (r *queryResolver) Genders(ctx context.Context) ([]*model.Gender, error) {
+	res, err := r.gender.GenderList(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	genders := make([]*model.Gender, len(res))
+	for i, v := range res {
+		genders[i] = &model.Gender{
+			GenderID: v.GenderID,
+			Gender:   v.Gender,
+		}
+	}
+
+	return genders, nil
 }
 
 // Gender is the resolver for the gender field.
 func (r *queryResolver) Gender(ctx context.Context, genderID int) (*model.Gender, error) {
-	panic(fmt.Errorf("not implemented: Gender - gender"))
+	res, err := r.gender.GetGenderByID(ctx, genderID)
+	if err != nil {
+		return nil, err
+	}
+
+	gender := &model.Gender{
+		GenderID: res.GenderID,
+		Gender:   res.Gender,
+	}
+
+	return gender, nil
 }

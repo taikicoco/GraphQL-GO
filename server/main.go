@@ -18,8 +18,9 @@ func newResolvers(db *sqlx.DB) *resolver.Resolver {
 	anime := usecase.NewAnime(db)
 	spot := usecase.NewSpot(db)
 	prefecture := usecase.NewPrefecture(db)
+	gender := usecase.NewGender(db)
 
-	return resolver.NewResolver(anime, spot, prefecture)
+	return resolver.NewResolver(anime, spot, prefecture, gender)
 }
 
 func main() {
