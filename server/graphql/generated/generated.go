@@ -173,7 +173,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Anime(childComplexity, args["animeID"].(int)), true
+		return e.complexity.Query.Anime(childComplexity, args["animeId"].(int)), true
 
 	case "Query.animes":
 		if e.complexity.Query.Animes == nil {
@@ -353,7 +353,7 @@ var sources = []*ast.Source{
 
 extend type Query {
     animes: [Anime]!
-    anime(animeID: Int!): Anime
+    anime(animeId: Int!): Anime
 }
 `, BuiltIn: false},
 	{Name: "../../../schema/prefecture.graphqls", Input: `type Prefecture {
@@ -410,14 +410,14 @@ func (ec *executionContext) field_Query_anime_args(ctx context.Context, rawArgs 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
-	if tmp, ok := rawArgs["animeID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("animeID"))
+	if tmp, ok := rawArgs["animeId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("animeId"))
 		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["animeID"] = arg0
+	args["animeId"] = arg0
 	return args, nil
 }
 
@@ -919,7 +919,7 @@ func (ec *executionContext) _Query_anime(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Anime(rctx, fc.Args["animeID"].(int))
+		return ec.resolvers.Query().Anime(rctx, fc.Args["animeId"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

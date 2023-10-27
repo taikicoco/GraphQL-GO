@@ -7,5 +7,5 @@ type Anime {
 
 extend type Query {
     animes: [Anime]!
-    anime(animeID: Int!): Anime
+    anime(animeId: Int!): Anime
 }
