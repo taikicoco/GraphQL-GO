@@ -1,0 +1,10 @@
+type Country {
+    countryId: Int!
+    name: String!
+    imgUrl: String
+}
+
+extend type Query {
+    countries: [Country]
+    country(countryId: Int!): Country
+}

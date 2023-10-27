@@ -1,0 +1,9 @@
+type Gender {
+    genderId: Int!
+    gender: String!
+}
+
+extend type Query {
+    genders: Gender
+    gender(genderId:Int!): Gender
+}
