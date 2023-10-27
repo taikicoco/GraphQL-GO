@@ -1,6 +1,8 @@
 package resolver
 
-import "server/usecase"
+import (
+	"server/usecase"
+)
 
 // This file will not be regenerated automatically.
 //
@@ -11,13 +13,16 @@ type Resolver struct {
 	spot       *usecase.Spot
 	prefecture *usecase.Prefecture
 	gender     *usecase.Gender
+	country    *usecase.Country
 }
 
-func NewResolver(anime *usecase.Anime, spot *usecase.Spot, prefecture *usecase.Prefecture, gender *usecase.Gender) *Resolver {
+func NewResolver(anime *usecase.Anime, spot *usecase.Spot, prefecture *usecase.Prefecture,
+	gender *usecase.Gender, country *usecase.Country) *Resolver {
 	return &Resolver{
 		anime:      anime,
 		spot:       spot,
 		prefecture: prefecture,
 		gender:     gender,
+		country:    country,
 	}
 }

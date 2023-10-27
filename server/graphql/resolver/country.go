@@ -6,16 +6,41 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 	"server/graphql/generated/model"
 )
 
 // Countries is the resolver for the countries field.
 func (r *queryResolver) Countries(ctx context.Context) ([]*model.Country, error) {
-	panic(fmt.Errorf("not implemented: Countries - countries"))
+	res, err := r.country.CountryList(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	countries := make([]*model.Country, len(res))
+	for i, v := range res {
+		countries[i] = &model.Country{
+			CountryID: v.CountryID,
+			Name:      v.Name,
+			ImgURL:    &v.ImgURL,
+		}
+	}
+
+	return countries, nil
 }
 
 // Country is the resolver for the country field.
 func (r *queryResolver) Country(ctx context.Context, countryID int) (*model.Country, error) {
-	panic(fmt.Errorf("not implemented: Country - country"))
+	res, err := r.country.GetCountryByID(ctx, countryID)
+	if err != nil {
+		return nil, err
+	}
+
+	country := &model.Country{
+		CountryID: res.CountryID,
+		Name:      res.Name,
+		ImgURL:    &res.ImgURL,
+	}
+
+	return country, nil
+
 }
