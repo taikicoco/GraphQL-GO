@@ -6,14 +6,23 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 	"server/graphql/generated"
 	"server/graphql/generated/model"
 )
 
 // Gender is the resolver for the gender field.
 func (r *guideResolver) Gender(ctx context.Context, obj *model.Guide) (*model.Gender, error) {
-	panic(fmt.Errorf("not implemented: Gender - gender"))
+	res, err := r.gender.GetGenderByGuideID(ctx, obj.GuideID)
+	if err != nil {
+		return nil, err
+	}
+
+	gender := &model.Gender{
+		GenderID: res.GenderID,
+		Gender:   res.Gender,
+	}
+
+	return gender, nil
 }
 
 // Country is the resolver for the country field.

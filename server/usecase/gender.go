@@ -9,7 +9,7 @@ import (
 )
 
 type Gender struct {
-	db        *sqlx.DB
+	db         *sqlx.DB
 	genderRepo *repository.GenderRepository
 }
 
@@ -29,6 +29,14 @@ func (a *Gender) GenderList(ctx context.Context) ([]*model.Gender, error) {
 
 func (a *Gender) GetGenderByID(ctx context.Context, genderID int) (*model.Gender, error) {
 	gender, err := a.genderRepo.GetByID(ctx, a.db, genderID)
+	if err != nil {
+		return nil, err
+	}
+	return gender, nil
+}
+
+func (g *Gender) GetGenderByGuideID(ctx context.Context, genderID int) (*model.Gender, error) {
+	gender, err := g.genderRepo.GetByGuideID(ctx, g.db, genderID)
 	if err != nil {
 		return nil, err
 	}
