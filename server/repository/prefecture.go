@@ -31,12 +31,14 @@ func (pr *PrefectureRepository) GetByID(ctx context.Context, db *sqlx.DB, prefec
 func (pr *PrefectureRepository) GetByAnimeID(ctx context.Context, db *sqlx.DB, animeID int) ([]*model.Prefecture, error) {
 	prefecture := []*model.Prefecture{}
 	err := db.Select(&prefecture,
-		`SELECT  DISTINCT sa.prefecture_id, sa.name
-		FROM prefectures sa
-		INNER JOIN spots s ON sa.prefecture_id = s.prefecture_id
-		WHERE s.anime_id = ?`, animeID)
+		`select distinct p.prefecture_id, p.name
+		from prefectures p
+		inner join spots s on p.prefecture_id = s.prefecture_id
+		where s.anime_id = ?`, animeID)
 	if err != nil {
 		return nil, err
 	}
+
+
 	return prefecture, nil
 }
