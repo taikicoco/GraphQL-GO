@@ -71,3 +71,9 @@ models:
     fields:
       spot:
         resolver: true
+  Guide:
+    fields:
+      gender:
+        resolver: true
+      country:
+        resolver: true

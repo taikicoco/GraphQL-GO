@@ -25,6 +25,20 @@ func (ar *GenderRepository) GetByID(ctx context.Context, db *sqlx.DB, genderID i
 	if err != nil {
 		return nil, err
 	}
-	return gender, nil
 
+	return gender, nil
+}
+
+func (gr *GenderRepository) GetByGuideID(ctx context.Context, db *sqlx.DB, guideID int) (*model.Gender, error) {
+	gender := &model.Gender{}
+	err := db.Get(gender,
+		`select ge.gender_id, ge.gender
+		from genders ge
+		inner join guides gu on gu.gender_id = ge.gender_id
+		where gu.guide_id = ?`, guideID)
+	if err != nil {
+		return nil, err
+	}
+
+	return gender, nil
 }

@@ -42,5 +42,4 @@ func (r *queryResolver) Country(ctx context.Context, countryID int) (*model.Coun
 	}
 
 	return country, nil
-
 }

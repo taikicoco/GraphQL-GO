@@ -34,3 +34,11 @@ func (a *Country) GetCountryByID(ctx context.Context, countryID int) (*model.Cou
 	}
 	return country, nil
 }
+
+func (c *Country) GetCountryByGuideID(ctx context.Context, guideID int) (*model.Country, error) {
+	country, err := c.countryRepo.GetByGuideID(ctx, c.db, guideID)
+	if err != nil {
+		return nil, err
+	}
+	return country, nil
+}
