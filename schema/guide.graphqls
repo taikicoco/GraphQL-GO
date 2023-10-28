@@ -12,4 +12,5 @@ type Guide {
 extend type Query {
     guides: [Guide!]
     guide(guideId: Int!): Guide
+    guideByAnimeIdsAndPrefectureIds(animeIds: [Int!], prefectureIds: [Int!]): [Guide!]
 }

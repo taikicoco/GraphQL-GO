@@ -83,19 +83,20 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Anime            func(childComplexity int, animeID int) int
-		Animes           func(childComplexity int) int
-		AnimesByanimeIds func(childComplexity int, animeIds []int) int
-		Countries        func(childComplexity int) int
-		Country          func(childComplexity int, countryID int) int
-		Gender           func(childComplexity int, genderID int) int
-		Genders          func(childComplexity int) int
-		Guide            func(childComplexity int, guideID int) int
-		Guides           func(childComplexity int) int
-		Prefecture       func(childComplexity int, prefectureID int) int
-		Prefectures      func(childComplexity int) int
-		Spot             func(childComplexity int, spotID int) int
-		Spots            func(childComplexity int) int
+		Anime                           func(childComplexity int, animeID int) int
+		Animes                          func(childComplexity int) int
+		AnimesByanimeIds                func(childComplexity int, animeIds []int) int
+		Countries                       func(childComplexity int) int
+		Country                         func(childComplexity int, countryID int) int
+		Gender                          func(childComplexity int, genderID int) int
+		Genders                         func(childComplexity int) int
+		Guide                           func(childComplexity int, guideID int) int
+		GuideByAnimeIdsAndPrefectureIds func(childComplexity int, animeIds []int, prefectureIds []int) int
+		Guides                          func(childComplexity int) int
+		Prefecture                      func(childComplexity int, prefectureID int) int
+		Prefectures                     func(childComplexity int) int
+		Spot                            func(childComplexity int, spotID int) int
+		Spots                           func(childComplexity int) int
 	}
 
 	Spot struct {
@@ -127,6 +128,7 @@ type QueryResolver interface {
 	Gender(ctx context.Context, genderID int) (*model.Gender, error)
 	Guides(ctx context.Context) ([]*model.Guide, error)
 	Guide(ctx context.Context, guideID int) (*model.Guide, error)
+	GuideByAnimeIdsAndPrefectureIds(ctx context.Context, animeIds []int, prefectureIds []int) ([]*model.Guide, error)
 	Prefecture(ctx context.Context, prefectureID int) (*model.Prefecture, error)
 	Prefectures(ctx context.Context) ([]*model.Prefecture, error)
 	Spots(ctx context.Context) ([]*model.Spot, error)
@@ -376,6 +378,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Guide(childComplexity, args["guideId"].(int)), true
 
+	case "Query.guideByAnimeIdsAndPrefectureIds":
+		if e.complexity.Query.GuideByAnimeIdsAndPrefectureIds == nil {
+			break
+		}
+
+		args, err := ec.field_Query_guideByAnimeIdsAndPrefectureIds_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GuideByAnimeIdsAndPrefectureIds(childComplexity, args["animeIds"].([]int), args["prefectureIds"].([]int)), true
+
 	case "Query.guides":
 		if e.complexity.Query.Guides == nil {
 			break
@@ -593,6 +607,7 @@ extend type Query {
 extend type Query {
     guides: [Guide!]
     guide(guideId: Int!): Guide
+    guideByAnimeIdsAndPrefectureIds(animeIds: [Int!], prefectureIds: [Int!]): [Guide!]
 }
 `, BuiltIn: false},
 	{Name: "../../../schema/prefecture.graphqls", Input: `type Prefecture {
@@ -702,6 +717,30 @@ func (ec *executionContext) field_Query_gender_args(ctx context.Context, rawArgs
 		}
 	}
 	args["genderId"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_guideByAnimeIdsAndPrefectureIds_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []int
+	if tmp, ok := rawArgs["animeIds"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("animeIds"))
+		arg0, err = ec.unmarshalOInt2ᚕintᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["animeIds"] = arg0
+	var arg1 []int
+	if tmp, ok := rawArgs["prefectureIds"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("prefectureIds"))
+		arg1, err = ec.unmarshalOInt2ᚕintᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["prefectureIds"] = arg1
 	return args, nil
 }
 
@@ -2242,6 +2281,76 @@ func (ec *executionContext) fieldContext_Query_guide(ctx context.Context, field 
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_guide_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_guideByAnimeIdsAndPrefectureIds(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_guideByAnimeIdsAndPrefectureIds(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GuideByAnimeIdsAndPrefectureIds(rctx, fc.Args["animeIds"].([]int), fc.Args["prefectureIds"].([]int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Guide)
+	fc.Result = res
+	return ec.marshalOGuide2ᚕᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐGuideᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_guideByAnimeIdsAndPrefectureIds(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "guideId":
+				return ec.fieldContext_Guide_guideId(ctx, field)
+			case "name":
+				return ec.fieldContext_Guide_name(ctx, field)
+			case "age":
+				return ec.fieldContext_Guide_age(ctx, field)
+			case "comment":
+				return ec.fieldContext_Guide_comment(ctx, field)
+			case "stance":
+				return ec.fieldContext_Guide_stance(ctx, field)
+			case "favoriteCharacter":
+				return ec.fieldContext_Guide_favoriteCharacter(ctx, field)
+			case "gender":
+				return ec.fieldContext_Guide_gender(ctx, field)
+			case "country":
+				return ec.fieldContext_Guide_country(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Guide", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_guideByAnimeIdsAndPrefectureIds_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -5170,6 +5279,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "guideByAnimeIdsAndPrefectureIds":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_guideByAnimeIdsAndPrefectureIds(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "prefecture":
 			field := field
 
@@ -6266,6 +6394,44 @@ func (ec *executionContext) marshalOGuide2ᚖserverᚋgraphqlᚋgeneratedᚋmode
 		return graphql.Null
 	}
 	return ec._Guide(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOInt2ᚕintᚄ(ctx context.Context, v interface{}) ([]int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]int, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNInt2int(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOInt2ᚕintᚄ(ctx context.Context, sel ast.SelectionSet, v []int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNInt2int(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
