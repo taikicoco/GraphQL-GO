@@ -19,24 +19,24 @@ func NewPrefecture(db *sqlx.DB) *Prefecture {
 	}
 }
 
-func (a *Prefecture) PrefectureList(ctx context.Context) ([]*model.Prefecture, error) {
-	prefectures, err := a.prefectureRepo.GetAll(ctx, a.db)
+func (p *Prefecture) PrefectureList(ctx context.Context) ([]*model.Prefecture, error) {
+	prefectures, err := p.prefectureRepo.GetAll(ctx, p.db)
 	if err != nil {
 		return nil, err
 	}
 	return prefectures, nil
 }
 
-func (a *Prefecture) GetPrefectureByID(ctx context.Context, prefectureID int) (*model.Prefecture, error) {
-	prefecture, err := a.prefectureRepo.GetByID(ctx, a.db, prefectureID)
+func (p *Prefecture) GetPrefectureByID(ctx context.Context, prefectureID int) (*model.Prefecture, error) {
+	prefecture, err := p.prefectureRepo.GetByID(ctx, p.db, prefectureID)
 	if err != nil {
 		return nil, err
 	}
 	return prefecture, nil
 }
 
-func (sa *Prefecture) GetPrefectureByAnimeID(ctx context.Context, animeId int) ([]*model.Prefecture, error) {
-	prefecture, err := sa.prefectureRepo.GetByAnimeID(ctx, sa.db, animeId)
+func (p *Prefecture) GetPrefectureByAnimeID(ctx context.Context, animeId int) ([]*model.Prefecture, error) {
+	prefecture, err := p.prefectureRepo.GetByAnimeID(ctx, p.db, animeId)
 	if err != nil {
 		return nil, err
 	}

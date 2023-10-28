@@ -19,16 +19,16 @@ func NewSpot(db *sqlx.DB) *Spot {
 	}
 }
 
-func (a *Spot) SpotList(ctx context.Context) ([]*model.Spot, error) {
-	spots, err := a.spotRepo.GetAll(ctx, a.db)
+func (s *Spot) SpotList(ctx context.Context) ([]*model.Spot, error) {
+	spots, err := s.spotRepo.GetAll(ctx, s.db)
 	if err != nil {
 		return nil, err
 	}
 	return spots, nil
 }
 
-func (a *Spot) GetSpotByID(ctx context.Context, spotID int) (*model.Spot, error) {
-	spot, err := a.spotRepo.GetByID(ctx, a.db, spotID)
+func (s *Spot) GetSpotByID(ctx context.Context, spotID int) (*model.Spot, error) {
+	spot, err := s.spotRepo.GetByID(ctx, s.db, spotID)
 	if err != nil {
 		return nil, err
 	}

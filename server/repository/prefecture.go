@@ -28,7 +28,7 @@ func (pr *PrefectureRepository) GetByID(ctx context.Context, db *sqlx.DB, prefec
 	return prefecture, nil
 }
 
-func (r *PrefectureRepository) GetByAnimeID(ctx context.Context, db *sqlx.DB, animeID int) ([]*model.Prefecture, error) {
+func (pr *PrefectureRepository) GetByAnimeID(ctx context.Context, db *sqlx.DB, animeID int) ([]*model.Prefecture, error) {
 	prefecture := []*model.Prefecture{}
 	err := db.Select(&prefecture,
 		`SELECT  DISTINCT sa.prefecture_id, sa.name

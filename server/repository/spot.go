@@ -33,7 +33,7 @@ func (sr *SpotRepository) GetByID(ctx context.Context, db *sqlx.DB, spotID int) 
 	return spot, nil
 }
 
-func (r *SpotRepository) GetByPrefectureID(ctx context.Context, db *sqlx.DB, animeID int, prefectureID int) ([]*model.Spot, error) {
+func (sr *SpotRepository) GetByPrefectureID(ctx context.Context, db *sqlx.DB, animeID int, prefectureID int) ([]*model.Spot, error) {
 	var spots []*model.Spot
 	err := db.Select(&spots,
 		`SELECT spot_id, name, anime_img_url, real_img_url, address

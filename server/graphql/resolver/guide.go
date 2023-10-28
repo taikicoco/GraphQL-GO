@@ -11,8 +11,8 @@ import (
 )
 
 // Gender is the resolver for the gender field.
-func (r *guideResolver) Gender(ctx context.Context, obj *model.Guide) (*model.Gender, error) {
-	res, err := r.gender.GetGenderByGuideID(ctx, obj.GuideID)
+func (gr *guideResolver) Gender(ctx context.Context, obj *model.Guide) (*model.Gender, error) {
+	res, err := gr.gender.GetGenderByGuideID(ctx, obj.GuideID)
 	if err != nil {
 		return nil, err
 	}
@@ -26,8 +26,8 @@ func (r *guideResolver) Gender(ctx context.Context, obj *model.Guide) (*model.Ge
 }
 
 // Country is the resolver for the country field.
-func (r *guideResolver) Country(ctx context.Context, obj *model.Guide) (*model.Country, error) {
-	res, err := r.country.GetCountryByGuideID(ctx, obj.GuideID)
+func (gr *guideResolver) Country(ctx context.Context, obj *model.Guide) (*model.Country, error) {
+	res, err := gr.country.GetCountryByGuideID(ctx, obj.GuideID)
 	if err != nil {
 		return nil, err
 	}
