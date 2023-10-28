@@ -83,18 +83,19 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Anime       func(childComplexity int, animeID int) int
-		Animes      func(childComplexity int) int
-		Countries   func(childComplexity int) int
-		Country     func(childComplexity int, countryID int) int
-		Gender      func(childComplexity int, genderID int) int
-		Genders     func(childComplexity int) int
-		Guide       func(childComplexity int, guideID int) int
-		Guides      func(childComplexity int) int
-		Prefecture  func(childComplexity int, prefectureID int) int
-		Prefectures func(childComplexity int) int
-		Spot        func(childComplexity int, spotID int) int
-		Spots       func(childComplexity int) int
+		Anime            func(childComplexity int, animeID int) int
+		Animes           func(childComplexity int) int
+		AnimesByanimeIds func(childComplexity int, animeIds []int) int
+		Countries        func(childComplexity int) int
+		Country          func(childComplexity int, countryID int) int
+		Gender           func(childComplexity int, genderID int) int
+		Genders          func(childComplexity int) int
+		Guide            func(childComplexity int, guideID int) int
+		Guides           func(childComplexity int) int
+		Prefecture       func(childComplexity int, prefectureID int) int
+		Prefectures      func(childComplexity int) int
+		Spot             func(childComplexity int, spotID int) int
+		Spots            func(childComplexity int) int
 	}
 
 	Spot struct {
@@ -118,6 +119,7 @@ type PrefectureResolver interface {
 }
 type QueryResolver interface {
 	Animes(ctx context.Context) ([]*model.Anime, error)
+	AnimesByanimeIds(ctx context.Context, animeIds []int) ([]*model.Anime, error)
 	Anime(ctx context.Context, animeID int) (*model.Anime, error)
 	Countries(ctx context.Context) ([]*model.Country, error)
 	Country(ctx context.Context, countryID int) (*model.Country, error)
@@ -311,6 +313,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Animes(childComplexity), true
+
+	case "Query.animesByanimeIds":
+		if e.complexity.Query.AnimesByanimeIds == nil {
+			break
+		}
+
+		args, err := ec.field_Query_animesByanimeIds_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AnimesByanimeIds(childComplexity, args["animeIds"].([]int)), true
 
 	case "Query.countries":
 		if e.complexity.Query.Countries == nil {
@@ -540,6 +554,7 @@ var sources = []*ast.Source{
 
 extend type Query {
     animes: [Anime]!
+    animesByanimeIds(animeIds: [Int!]!): [Anime]!
     anime(animeId: Int!): Anime
 }
 `, BuiltIn: false},
@@ -642,6 +657,21 @@ func (ec *executionContext) field_Query_anime_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["animeId"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_animesByanimeIds_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []int
+	if tmp, ok := rawArgs["animeIds"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("animeIds"))
+		arg0, err = ec.unmarshalNInt2ᚕintᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["animeIds"] = arg0
 	return args, nil
 }
 
@@ -1744,6 +1774,71 @@ func (ec *executionContext) fieldContext_Query_animes(ctx context.Context, field
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Anime", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_animesByanimeIds(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_animesByanimeIds(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AnimesByanimeIds(rctx, fc.Args["animeIds"].([]int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Anime)
+	fc.Result = res
+	return ec.marshalNAnime2ᚕᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐAnime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_animesByanimeIds(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "animeId":
+				return ec.fieldContext_Anime_animeId(ctx, field)
+			case "name":
+				return ec.fieldContext_Anime_name(ctx, field)
+			case "imgUrl":
+				return ec.fieldContext_Anime_imgUrl(ctx, field)
+			case "prefecture":
+				return ec.fieldContext_Anime_prefecture(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Anime", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_animesByanimeIds_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -4920,6 +5015,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "animesByanimeIds":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_animesByanimeIds(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "anime":
 			field := field
 
@@ -5640,6 +5757,38 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNInt2ᚕintᚄ(ctx context.Context, v interface{}) ([]int, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]int, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNInt2int(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNInt2ᚕintᚄ(ctx context.Context, sel ast.SelectionSet, v []int) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNInt2int(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalNPrefecture2ᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐPrefecture(ctx context.Context, sel ast.SelectionSet, v *model.Prefecture) graphql.Marshaler {

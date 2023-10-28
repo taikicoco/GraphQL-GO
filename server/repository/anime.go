@@ -11,7 +11,7 @@ type AnimeRepository struct{}
 
 func (ar *AnimeRepository) GetAll(ctx context.Context, db *sqlx.DB) ([]*model.Anime, error) {
 	animes := []*model.Anime{}
-	err := db.SelectContext(ctx, &animes, "SELECT anime_id, name FROM animes")
+	err := db.SelectContext(ctx, &animes, `SELECT anime_id, name, img_url FROM animes`)
 
 	if err != nil {
 		return nil, err
@@ -21,7 +21,7 @@ func (ar *AnimeRepository) GetAll(ctx context.Context, db *sqlx.DB) ([]*model.An
 
 func (ar *AnimeRepository) GetByID(ctx context.Context, db *sqlx.DB, animeID int) (*model.Anime, error) {
 	anime := &model.Anime{}
-	err := db.Get(anime, `select anime_id, name from animes where anime_id = ?`, animeID)
+	err := db.Get(anime, `select anime_id, name, img_url from animes where anime_id = ?`, animeID)
 	if err != nil {
 		return nil, err
 	}
