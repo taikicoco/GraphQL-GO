@@ -1,5 +1,5 @@
 -- +goose Up
-CREATE TABLE guides (
+CREATE TABLE  IF NOT EXISTS guides (
     guide_id INT AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     gender_id INT NOT NULL,

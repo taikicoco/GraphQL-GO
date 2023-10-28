@@ -35,3 +35,13 @@ INSERT INTO guides (name, gender_id, country_id, age, comment, stance, favorite_
 ('Guide One', 1, 1, 25, 'Comment One', 'Stance One', 'Character One'),
 ('Guide Two', 2, 2, 30, 'Comment Two', 'Stance Two', 'Character Two'),
 ('Guide Three', 3, 3, 35, 'Comment Three', 'Stance Three', 'Character Three');
+
+-- Inserting data into 'guide_prefectures' table
+INSERT INTO guide_prefectures (guide_id, prefecture_id) VALUES (1, 1);
+INSERT INTO guide_prefectures (guide_id, prefecture_id) VALUES (1, 2);
+INSERT INTO guide_prefectures (guide_id, prefecture_id) VALUES (2, 2);
+
+-- Inserting data into 'guide_animes' table
+INSERT INTO guide_animes (guide_id, anime_id) VALUES (1, 1);
+INSERT INTO guide_animes (guide_id, anime_id) VALUES (1, 2);
+INSERT INTO guide_animes (guide_id, anime_id) VALUES (2, 2);
