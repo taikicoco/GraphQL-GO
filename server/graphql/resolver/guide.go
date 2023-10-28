@@ -6,7 +6,6 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 	"server/graphql/generated"
 	"server/graphql/generated/model"
 )
@@ -82,7 +81,22 @@ func (r *queryResolver) Guide(ctx context.Context, guideID int) (*model.Guide, e
 
 // GuideByAnimeIdsAndPrefectureIds is the resolver for the guideByAnimeIdsAndPrefectureIds field.
 func (r *queryResolver) GuideByAnimeIdsAndPrefectureIds(ctx context.Context, animeIds []int, prefectureIds []int) ([]*model.Guide, error) {
-	panic(fmt.Errorf("not implemented: GuideByAnimeIdsAndPrefectureIds - guideByAnimeIdsAndPrefectureIds"))
+	res, err := r.guide.GetGuidesByAnimeIDsAndPrefectureIDs(ctx, animeIds, prefectureIds)
+	if err != nil {
+		return nil, err
+	}
+	animes := make([]*model.Guide, len(res))
+	for i, v := range res {
+		animes[i] = &model.Guide{
+			GuideID:           v.GuideID,
+			Name:              v.Name,
+			Age:               v.Age,
+			Comment:           &v.Comment,
+			Stance:            &v.Stance,
+			FavoriteCharacter: &v.FavoriteCharacter,
+		}
+	}
+	return animes, nil
 }
 
 // Guide returns generated.GuideResolver implementation.
