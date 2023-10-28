@@ -11,8 +11,8 @@ import (
 )
 
 // Spot is the resolver for the spot field.
-func (pr *prefectureResolver) Spot(ctx context.Context, obj *model.Prefecture) ([]*model.Spot, error) {
-	res, err := pr.spot.GetSpotByPrefectureID(ctx, *obj.AnimeID, obj.PrefectureID)
+func (r *prefectureResolver) Spot(ctx context.Context, obj *model.Prefecture) ([]*model.Spot, error) {
+	res, err := r.spot.GetSpotByPrefectureID(ctx, *obj.AnimeID, obj.PrefectureID)
 	if err != nil {
 		return nil, err
 	}
