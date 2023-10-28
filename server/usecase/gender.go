@@ -19,16 +19,16 @@ func NewGender(db *sqlx.DB) *Gender {
 	}
 }
 
-func (a *Gender) GenderList(ctx context.Context) ([]*model.Gender, error) {
-	genders, err := a.genderRepo.GetAll(ctx, a.db)
+func (g *Gender) GenderList(ctx context.Context) ([]*model.Gender, error) {
+	genders, err := g.genderRepo.GetAll(ctx, g.db)
 	if err != nil {
 		return nil, err
 	}
 	return genders, nil
 }
 
-func (a *Gender) GetGenderByID(ctx context.Context, genderID int) (*model.Gender, error) {
-	gender, err := a.genderRepo.GetByID(ctx, a.db, genderID)
+func (g *Gender) GetGenderByID(ctx context.Context, genderID int) (*model.Gender, error) {
+	gender, err := g.genderRepo.GetByID(ctx, g.db, genderID)
 	if err != nil {
 		return nil, err
 	}

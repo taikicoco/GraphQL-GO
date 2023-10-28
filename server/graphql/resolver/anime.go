@@ -11,8 +11,8 @@ import (
 )
 
 // Prefecture is the resolver for the prefecture field.
-func (r *animeResolver) Prefecture(ctx context.Context, obj *model.Anime) ([]*model.Prefecture, error) {
-	res, err := r.prefecture.GetPrefectureByAnimeID(ctx, obj.AnimeID)
+func (ar *animeResolver) Prefecture(ctx context.Context, obj *model.Anime) ([]*model.Prefecture, error) {
+	res, err := ar.prefecture.GetPrefectureByAnimeID(ctx, obj.AnimeID)
 	if err != nil {
 		return nil, err
 	}

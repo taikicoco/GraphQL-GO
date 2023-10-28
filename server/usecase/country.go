@@ -19,16 +19,16 @@ func NewCountry(db *sqlx.DB) *Country {
 	}
 }
 
-func (a *Country) CountryList(ctx context.Context) ([]*model.Country, error) {
-	countrys, err := a.countryRepo.GetAll(ctx, a.db)
+func (c *Country) CountryList(ctx context.Context) ([]*model.Country, error) {
+	countrys, err := c.countryRepo.GetAll(ctx, c.db)
 	if err != nil {
 		return nil, err
 	}
 	return countrys, nil
 }
 
-func (a *Country) GetCountryByID(ctx context.Context, countryID int) (*model.Country, error) {
-	country, err := a.countryRepo.GetByID(ctx, a.db, countryID)
+func (c *Country) GetCountryByID(ctx context.Context, countryID int) (*model.Country, error) {
+	country, err := c.countryRepo.GetByID(ctx, c.db, countryID)
 	if err != nil {
 		return nil, err
 	}
