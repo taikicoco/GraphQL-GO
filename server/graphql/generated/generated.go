@@ -37,6 +37,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Anime() AnimeResolver
+	Guide() GuideResolver
 	Prefecture() PrefectureResolver
 	Query() QueryResolver
 }
@@ -107,6 +108,10 @@ type ComplexityRoot struct {
 
 type AnimeResolver interface {
 	Prefecture(ctx context.Context, obj *model.Anime) ([]*model.Prefecture, error)
+}
+type GuideResolver interface {
+	Gender(ctx context.Context, obj *model.Guide) (*model.Gender, error)
+	Country(ctx context.Context, obj *model.Guide) (*model.Country, error)
 }
 type PrefectureResolver interface {
 	Spot(ctx context.Context, obj *model.Prefecture) ([]*model.Spot, error)
@@ -1419,7 +1424,7 @@ func (ec *executionContext) _Guide_gender(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Gender, nil
+		return ec.resolvers.Guide().Gender(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1440,8 +1445,8 @@ func (ec *executionContext) fieldContext_Guide_gender(ctx context.Context, field
 	fc = &graphql.FieldContext{
 		Object:     "Guide",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "genderId":
@@ -1469,7 +1474,7 @@ func (ec *executionContext) _Guide_country(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Country, nil
+		return ec.resolvers.Guide().Country(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1490,8 +1495,8 @@ func (ec *executionContext) fieldContext_Guide_country(ctx context.Context, fiel
 	fc = &graphql.FieldContext{
 		Object:     "Guide",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "countryId":
@@ -4682,17 +4687,17 @@ func (ec *executionContext) _Guide(ctx context.Context, sel ast.SelectionSet, ob
 		case "guideId":
 			out.Values[i] = ec._Guide_guideId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Guide_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "age":
 			out.Values[i] = ec._Guide_age(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "comment":
 			out.Values[i] = ec._Guide_comment(ctx, field, obj)
@@ -4701,15 +4706,77 @@ func (ec *executionContext) _Guide(ctx context.Context, sel ast.SelectionSet, ob
 		case "favoriteCharacter":
 			out.Values[i] = ec._Guide_favoriteCharacter(ctx, field, obj)
 		case "gender":
-			out.Values[i] = ec._Guide_gender(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Guide_gender(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "country":
-			out.Values[i] = ec._Guide_country(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Guide_country(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5522,6 +5589,10 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNCountry2serverᚋgraphqlᚋgeneratedᚋmodelᚐCountry(ctx context.Context, sel ast.SelectionSet, v model.Country) graphql.Marshaler {
+	return ec._Country(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNCountry2ᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐCountry(ctx context.Context, sel ast.SelectionSet, v *model.Country) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -5530,6 +5601,10 @@ func (ec *executionContext) marshalNCountry2ᚖserverᚋgraphqlᚋgeneratedᚋmo
 		return graphql.Null
 	}
 	return ec._Country(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNGender2serverᚋgraphqlᚋgeneratedᚋmodelᚐGender(ctx context.Context, sel ast.SelectionSet, v model.Gender) graphql.Marshaler {
+	return ec._Gender(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNGender2ᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐGender(ctx context.Context, sel ast.SelectionSet, v *model.Gender) graphql.Marshaler {

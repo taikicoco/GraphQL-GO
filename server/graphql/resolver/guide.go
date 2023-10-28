@@ -7,8 +7,19 @@ package resolver
 import (
 	"context"
 	"fmt"
+	"server/graphql/generated"
 	"server/graphql/generated/model"
 )
+
+// Gender is the resolver for the gender field.
+func (r *guideResolver) Gender(ctx context.Context, obj *model.Guide) (*model.Gender, error) {
+	panic(fmt.Errorf("not implemented: Gender - gender"))
+}
+
+// Country is the resolver for the country field.
+func (r *guideResolver) Country(ctx context.Context, obj *model.Guide) (*model.Country, error) {
+	panic(fmt.Errorf("not implemented: Country - country"))
+}
 
 // Guides is the resolver for the guides field.
 func (r *queryResolver) Guides(ctx context.Context) ([]*model.Guide, error) {
@@ -19,3 +30,8 @@ func (r *queryResolver) Guides(ctx context.Context) ([]*model.Guide, error) {
 func (r *queryResolver) Guide(ctx context.Context, guideID int) (*model.Guide, error) {
 	panic(fmt.Errorf("not implemented: Guide - guide"))
 }
+
+// Guide returns generated.GuideResolver implementation.
+func (r *Resolver) Guide() generated.GuideResolver { return &guideResolver{r} }
+
+type guideResolver struct{ *Resolver }
