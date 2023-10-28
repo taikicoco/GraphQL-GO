@@ -18,7 +18,17 @@ func (r *guideResolver) Gender(ctx context.Context, obj *model.Guide) (*model.Ge
 
 // Country is the resolver for the country field.
 func (r *guideResolver) Country(ctx context.Context, obj *model.Guide) (*model.Country, error) {
-	panic(fmt.Errorf("not implemented: Country - country"))
+	res, err := r.country.GetCountryByGuideID(ctx, obj.GuideID)
+	if err != nil {
+		return nil, err
+	}
+
+	country := &model.Country{
+		CountryID: res.CountryID,
+		Name:      res.Name,
+		ImgURL:    &res.ImgURL,
+	}
+	return country, nil
 }
 
 // Guides is the resolver for the guides field.
