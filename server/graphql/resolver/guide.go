@@ -23,12 +23,41 @@ func (r *guideResolver) Country(ctx context.Context, obj *model.Guide) (*model.C
 
 // Guides is the resolver for the guides field.
 func (r *queryResolver) Guides(ctx context.Context) ([]*model.Guide, error) {
-	panic(fmt.Errorf("not implemented: Guides - guides"))
+	res, err := r.guide.GuideList(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	guides := make([]*model.Guide, len(res))
+	for i, v := range res {
+		guides[i] = &model.Guide{
+			GuideID:           v.GuideID,
+			Name:              v.Name,
+			Age:               v.Age,
+			Comment:           &v.Comment,
+			Stance:            &v.Stance,
+			FavoriteCharacter: &v.FavoriteCharacter,
+		}
+	}
+	return guides, nil
 }
 
 // Guide is the resolver for the guide field.
 func (r *queryResolver) Guide(ctx context.Context, guideID int) (*model.Guide, error) {
-	panic(fmt.Errorf("not implemented: Guide - guide"))
+	res, err := r.guide.GetGuideByID(ctx, guideID)
+	if err != nil {
+		return nil, err
+	}
+
+	guide := &model.Guide{
+		GuideID:           res.GuideID,
+		Name:              res.Name,
+		Age:               res.Age,
+		Comment:           &res.Comment,
+		Stance:            &res.Stance,
+		FavoriteCharacter: &res.FavoriteCharacter,
+	}
+	return guide, nil
 }
 
 // Guide returns generated.GuideResolver implementation.

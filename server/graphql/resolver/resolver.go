@@ -14,15 +14,17 @@ type Resolver struct {
 	prefecture *usecase.Prefecture
 	gender     *usecase.Gender
 	country    *usecase.Country
+	guide      *usecase.Guide
 }
 
 func NewResolver(anime *usecase.Anime, spot *usecase.Spot, prefecture *usecase.Prefecture,
-	gender *usecase.Gender, country *usecase.Country) *Resolver {
+	gender *usecase.Gender, country *usecase.Country, guide *usecase.Guide) *Resolver {
 	return &Resolver{
 		anime:      anime,
 		spot:       spot,
 		prefecture: prefecture,
 		gender:     gender,
 		country:    country,
+		guide:      guide,
 	}
 }
