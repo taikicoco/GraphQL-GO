@@ -34,3 +34,11 @@ func (a *Anime) GetAnimeByID(ctx context.Context, animeID int) (*model.Anime, er
 	}
 	return anime, nil
 }
+
+func (a *Anime) GetAnimesByIDs(ctx context.Context, animeIDs []int) ([]*model.Anime, error) {
+	animes, err := a.animeRepo.GetByIDs(ctx, a.db, animeIDs)
+	if err != nil {
+		return nil, err
+	}
+	return animes, nil
+}
