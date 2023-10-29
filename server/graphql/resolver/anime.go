@@ -46,8 +46,8 @@ func (r *queryResolver) Animes(ctx context.Context) ([]*model.Anime, error) {
 	return animes, nil
 }
 
-// AnimesByanimeIds is the resolver for the animesByanimeIds field.
-func (r *queryResolver) AnimesByanimeIds(ctx context.Context, animeIds []int) ([]*model.Anime, error) {
+// AnimesByAnimeIds is the resolver for the animesByAnimeIds field.
+func (r *queryResolver) AnimesByAnimeIds(ctx context.Context, animeIds []int) ([]*model.Anime, error) {
 	res, err := r.anime.GetAnimesByIDs(ctx, animeIds)
 	if err != nil {
 		return nil, err

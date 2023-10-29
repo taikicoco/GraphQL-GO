@@ -85,7 +85,7 @@ type ComplexityRoot struct {
 	Query struct {
 		Anime                           func(childComplexity int, animeID int) int
 		Animes                          func(childComplexity int) int
-		AnimesByanimeIds                func(childComplexity int, animeIds []int) int
+		AnimesByAnimeIds                func(childComplexity int, animeIds []int) int
 		Countries                       func(childComplexity int) int
 		Country                         func(childComplexity int, countryID int) int
 		Gender                          func(childComplexity int, genderID int) int
@@ -120,7 +120,7 @@ type PrefectureResolver interface {
 }
 type QueryResolver interface {
 	Animes(ctx context.Context) ([]*model.Anime, error)
-	AnimesByanimeIds(ctx context.Context, animeIds []int) ([]*model.Anime, error)
+	AnimesByAnimeIds(ctx context.Context, animeIds []int) ([]*model.Anime, error)
 	Anime(ctx context.Context, animeID int) (*model.Anime, error)
 	Countries(ctx context.Context) ([]*model.Country, error)
 	Country(ctx context.Context, countryID int) (*model.Country, error)
@@ -316,17 +316,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Animes(childComplexity), true
 
-	case "Query.animesByanimeIds":
-		if e.complexity.Query.AnimesByanimeIds == nil {
+	case "Query.animesByAnimeIds":
+		if e.complexity.Query.AnimesByAnimeIds == nil {
 			break
 		}
 
-		args, err := ec.field_Query_animesByanimeIds_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_animesByAnimeIds_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.AnimesByanimeIds(childComplexity, args["animeIds"].([]int)), true
+		return e.complexity.Query.AnimesByAnimeIds(childComplexity, args["animeIds"].([]int)), true
 
 	case "Query.countries":
 		if e.complexity.Query.Countries == nil {
@@ -568,7 +568,7 @@ var sources = []*ast.Source{
 
 extend type Query {
     animes: [Anime!]
-    animesByanimeIds(animeIds: [Int!]!): [Anime!]
+    animesByAnimeIds(animeIds: [Int!]!): [Anime!]
     anime(animeId: Int!): Anime
 }
 `, BuiltIn: false},
@@ -675,7 +675,7 @@ func (ec *executionContext) field_Query_anime_args(ctx context.Context, rawArgs 
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_animesByanimeIds_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_animesByAnimeIds_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 []int
@@ -1814,8 +1814,8 @@ func (ec *executionContext) fieldContext_Query_animes(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_animesByanimeIds(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_animesByanimeIds(ctx, field)
+func (ec *executionContext) _Query_animesByAnimeIds(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_animesByAnimeIds(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1828,7 +1828,7 @@ func (ec *executionContext) _Query_animesByanimeIds(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AnimesByanimeIds(rctx, fc.Args["animeIds"].([]int))
+		return ec.resolvers.Query().AnimesByAnimeIds(rctx, fc.Args["animeIds"].([]int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1842,7 +1842,7 @@ func (ec *executionContext) _Query_animesByanimeIds(ctx context.Context, field g
 	return ec.marshalOAnime2ᚕᚖserverᚋgraphqlᚋgeneratedᚋmodelᚐAnimeᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_animesByanimeIds(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_animesByAnimeIds(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1869,7 +1869,7 @@ func (ec *executionContext) fieldContext_Query_animesByanimeIds(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_animesByanimeIds_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_animesByAnimeIds_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -5115,7 +5115,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "animesByanimeIds":
+		case "animesByAnimeIds":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -5124,7 +5124,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_animesByanimeIds(ctx, field)
+				res = ec._Query_animesByAnimeIds(ctx, field)
 				return res
 			}
 
