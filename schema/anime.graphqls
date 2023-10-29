@@ -6,7 +6,7 @@ type Anime {
 }
 
 extend type Query {
-    animes: [Anime]!
-    animesByanimeIds(animeIds: [Int!]!): [Anime]!
+    animes: [Anime!]
+    animesByanimeIds(animeIds: [Int!]!): [Anime!]
     anime(animeId: Int!): Anime
 }

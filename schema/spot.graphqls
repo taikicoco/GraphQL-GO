@@ -7,6 +7,6 @@ type Spot {
 }
 
 extend type Query {
-    spots: [Spot]
+    spots: [Spot!]
     spot(spotId: Int!): Spot
 }
