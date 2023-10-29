@@ -19,7 +19,7 @@ func NewGender(db *sqlx.DB) *Gender {
 	}
 }
 
-func (g *Gender) GenderList(ctx context.Context) ([]*model.Gender, error) {
+func (g *Gender) GetGenders(ctx context.Context) ([]*model.Gender, error) {
 	genders, err := g.genderRepo.GetAll(ctx, g.db)
 	if err != nil {
 		return nil, err

@@ -19,7 +19,7 @@ func NewSpot(db *sqlx.DB) *Spot {
 	}
 }
 
-func (s *Spot) SpotList(ctx context.Context) ([]*model.Spot, error) {
+func (s *Spot) GetSpots(ctx context.Context) ([]*model.Spot, error) {
 	spots, err := s.spotRepo.GetAll(ctx, s.db)
 	if err != nil {
 		return nil, err

@@ -11,7 +11,7 @@ import (
 
 // Spots is the resolver for the spots field.
 func (r *queryResolver) Spots(ctx context.Context) ([]*model.Spot, error) {
-	res, err := r.spot.SpotList(ctx)
+	res, err := r.spot.GetSpots(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -11,7 +11,7 @@ import (
 
 // Countries is the resolver for the countries field.
 func (r *queryResolver) Countries(ctx context.Context) ([]*model.Country, error) {
-	res, err := r.country.CountryList(ctx)
+	res, err := r.country.GetCountrys(ctx)
 	if err != nil {
 		return nil, err
 	}

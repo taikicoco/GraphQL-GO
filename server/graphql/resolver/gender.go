@@ -11,7 +11,7 @@ import (
 
 // Genders is the resolver for the genders field.
 func (r *queryResolver) Genders(ctx context.Context) ([]*model.Gender, error) {
-	res, err := r.gender.GenderList(ctx)
+	res, err := r.gender.GetGenders(ctx)
 	if err != nil {
 		return nil, err
 	}

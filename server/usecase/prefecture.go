@@ -19,7 +19,7 @@ func NewPrefecture(db *sqlx.DB) *Prefecture {
 	}
 }
 
-func (p *Prefecture) PrefectureList(ctx context.Context) ([]*model.Prefecture, error) {
+func (p *Prefecture) GetPrefectures(ctx context.Context) ([]*model.Prefecture, error) {
 	prefectures, err := p.prefectureRepo.GetAll(ctx, p.db)
 	if err != nil {
 		return nil, err

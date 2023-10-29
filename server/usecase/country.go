@@ -19,7 +19,7 @@ func NewCountry(db *sqlx.DB) *Country {
 	}
 }
 
-func (c *Country) CountryList(ctx context.Context) ([]*model.Country, error) {
+func (c *Country) GetCountrys(ctx context.Context) ([]*model.Country, error) {
 	countrys, err := c.countryRepo.GetAll(ctx, c.db)
 	if err != nil {
 		return nil, err

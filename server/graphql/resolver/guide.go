@@ -42,7 +42,7 @@ func (r *guideResolver) Country(ctx context.Context, obj *model.Guide) (*model.C
 
 // Guides is the resolver for the guides field.
 func (r *queryResolver) Guides(ctx context.Context) ([]*model.Guide, error) {
-	res, err := r.guide.GuideList(ctx)
+	res, err := r.guide.GetGuides(ctx)
 	if err != nil {
 		return nil, err
 	}

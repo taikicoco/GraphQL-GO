@@ -19,7 +19,7 @@ func NewGuide(db *sqlx.DB) *Guide {
 	}
 }
 
-func (g *Guide) GuideList(ctx context.Context) ([]*model.Guide, error) {
+func (g *Guide) GetGuides(ctx context.Context) ([]*model.Guide, error) {
 	guides, err := g.guideRepo.GetAll(ctx, g.db)
 	if err != nil {
 		return nil, err

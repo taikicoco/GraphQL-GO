@@ -30,7 +30,7 @@ func (r *animeResolver) Prefecture(ctx context.Context, obj *model.Anime) ([]*mo
 
 // Animes is the resolver for the animes field.
 func (r *queryResolver) Animes(ctx context.Context) ([]*model.Anime, error) {
-	res, err := r.anime.AnimeList(ctx)
+	res, err := r.anime.GetAnimes(ctx)
 	if err != nil {
 		return nil, err
 	}
