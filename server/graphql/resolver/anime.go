@@ -48,18 +48,20 @@ func (r *queryResolver) Animes(ctx context.Context) ([]*model.Anime, error) {
 
 // AnimesByanimeIds is the resolver for the animesByanimeIds field.
 func (r *queryResolver) AnimesByanimeIds(ctx context.Context, animeIds []int) ([]*model.Anime, error) {
-	animes := []*model.Anime{}
-	for _, anime_id := range animeIds {
-		res, err := r.anime.GetAnimeByID(ctx, anime_id)
-		if err != nil {
-			return nil, err
-		}
-		animes = append(animes, &model.Anime{
-			AnimeID: res.AnimeID,
-			Name:    res.Name,
-			ImgURL:  &res.ImgURL,
-		})
+	res, err := r.anime.GetAnimesByIDs(ctx, animeIds)
+	if err != nil {
+		return nil, err
 	}
+
+	animes := make([]*model.Anime, len(res))
+	for i, v := range res {
+		animes[i] = &model.Anime{
+			AnimeID: v.AnimeID,
+			Name:    v.Name,
+			ImgURL:  &v.ImgURL,
+		}
+	}
+
 	return animes, nil
 }
 

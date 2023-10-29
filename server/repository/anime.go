@@ -27,3 +27,23 @@ func (ar *AnimeRepository) GetByID(ctx context.Context, db *sqlx.DB, animeID int
 	}
 	return anime, nil
 }
+
+func (ar *AnimeRepository) GetByIDs(ctx context.Context, db *sqlx.DB, animeIDs []int) ([]*model.Anime, error) {
+	animes := []*model.Anime{}
+
+	query := `
+	select anime_id, name, img_url from animes where anime_id in (?)
+	`
+	query, args, err := sqlx.In(query, animeIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	query = db.Rebind(query)
+
+	err = db.Select(&animes, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return animes, nil
+}
